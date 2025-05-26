@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>XADREZ: CONTAGEM DE PONTOS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f0f0;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+      margin: 0;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      flex-wrap: wrap;
+      min-height: calc(100vh - 140px);
+    }
+
+    .player {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #ccc;
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .score-button {
+      font-size: 48px;
+      margin: 10px 0;
+      padding: 20px;
+      width: 100%;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.1s;
+      user-select: none;
+    }
+
+    .score-button:active {
+      transform: scale(0.97);
+    }
+
+    #score1 {
+      background-color: black;
+      color: white;
+      border: 2px solid black;
+    }
+
+    #score2 {
+      background-color: white;
+      color: black;
+      border: 2px solid black;
+    }
+
+    .reset-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .reset-button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .reset-button:hover {
+      background-color: #555;
+    }
+
+    @media (max-width: 599px) {
+      .container {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>XADREZ: CONTAGEM DE PONTOS</h1>
+
+  <div class="container">
+    <div class="player">
+      <button id="score1" class="score-button">0</button>
+    </div>
+
+    <div class="player">
+      <button id="score2" class="score-button">0</button>
+    </div>
+  </div>
+
+  <div class="reset-container">
+    <button class="reset-button" onclick="resetScores()">Resetar Pontos</button>
+  </div>
+
+  <script>
+    const scores = { p1: 0, p2: 0 };
+
+    const btn1 = document.getElementById('score1');
+    const btn2 = document.getElementById('score2');
+
+    function updateButton(button, value) {
+      button.textContent = value;
+    }
+
+    function resetScores() {
+      scores.p1 = 0;
+      scores.p2 = 0;
+      updateButton(btn1, scores.p1);
+      updateButton(btn2, scores.p2);
+    }
+
+    function setupHoldButton(button, playerKey) {
+      let timer;
+      let held = false;
+
+      const start = () => {
+        held = false;
+        timer = setTimeout(() => {
+          held = true;
+          if (scores[playerKey] > 0) {
+            scores[playerKey]--;
+            updateButton(button, scores[playerKey]);
+          }
+        }, 600);
+      };
+
+      const cancel = () => {
+        clearTimeout(timer);
+        if (!held) {
+          scores[playerKey]++;
+          updateButton(button, scores[playerKey]);
+        }
+      };
+
+      button.addEventListener('mousedown', start);
+      button.addEventListener('mouseup', cancel);
+      button.addEventListener('mouseleave', () => clearTimeout(timer));
+
+      button.addEventListener('touchstart', start);
+      button.addEventListener('touchend', cancel);
+      button.addEventListener('touchcancel', () => clearTimeout(timer));
+    }
+
+    setupHoldButton(btn1, 'p1');
+    setupHoldButton(btn2, 'p2');
+  </script>
+
+</body>
+</html>
