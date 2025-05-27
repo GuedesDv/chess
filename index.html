@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fundo Interativo</title>
+  <title>XADREZ : CONTAGEM DE PONTOS</title>
   <style>
     * {
       margin: 0;
@@ -11,52 +11,130 @@
       box-sizing: border-box;
     }
 
-    body, html {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .background {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(50,50,50,0.5)), 
-                  url('/mnt/data/Leonardo_Anime_XL_The_walrus_with_a_look_of_disdain_glares_at_0.jpg') no-repeat center center/cover;
-      transition: background-position 0.1s ease;
-    }
-
-    .overlay {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      background: radial-gradient(circle at center, rgba(255,255,255,0.1), transparent 70%);
-    }
-
-    .content {
-      position: relative;
-      z-index: 2;
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
       color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
       text-align: center;
-      padding-top: 20%;
-      font-size: 2rem;
-      font-family: sans-serif;
+    }
+
+    .score-container {
+      display: flex;
+      gap: 20px;
+    }
+
+    .score-btn {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .score-btn:active {
+      transform: scale(0.95);
+    }
+
+    .black-btn {
+      background: black;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .white-btn {
+      background: white;
+      color: black;
+      border: 2px solid black;
+    }
+
+    .reset-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .reset-btn:active {
+      transform: scale(0.97);
     }
   </style>
 </head>
 <body>
-  <div class="background" id="bg"></div>
-  <div class="overlay"></div>
-  <div class="content">
-    Bem-vindo ao fundo interativo!
+  <h1>XADREZ : CONTAGEM DE PONTOS</h1>
+  <div class="score-container">
+    <button id="player1" class="score-btn black-btn">0</button>
+    <button id="player2" class="score-btn white-btn">0</button>
   </div>
+  <button id="reset" class="reset-btn">Resetar</button>
 
   <script>
-    const bg = document.getElementById('bg');
-    document.addEventListener('mousemove', (e) => {
-      const x = e.clientX / window.innerWidth;
-      const y = e.clientY / window.innerHeight;
-      bg.style.backgroundPosition = `${50 + (x - 0.5) * 10}% ${50 + (y - 0.5) * 10}%`;
+    const scores = { player1: 0, player2: 0 };
+
+    function updateButton(button, value) {
+      button.textContent = value;
+    }
+
+    function setupHoldButton(button, playerKey) {
+      let timer;
+      let held = false;
+
+      const start = (e) => {
+        e.preventDefault();
+        held = false;
+        timer = setTimeout(() => {
+          held = true;
+          if (scores[playerKey] > 0) {
+            scores[playerKey]--;
+            updateButton(button, scores[playerKey]);
+          }
+        }, 600);
+      };
+
+      const cancel = (e) => {
+        e.preventDefault();
+        clearTimeout(timer);
+        if (!held) {
+          scores[playerKey]++;
+          updateButton(button, scores[playerKey]);
+        }
+      };
+
+      button.addEventListener('mousedown', start);
+      button.addEventListener('mouseup', cancel);
+      button.addEventListener('mouseleave', () => clearTimeout(timer));
+      button.addEventListener('touchstart', start, { passive: false });
+      button.addEventListener('touchend', cancel);
+      button.addEventListener('touchcancel', () => clearTimeout(timer));
+    }
+
+    const btn1 = document.getElementById('player1');
+    const btn2 = document.getElementById('player2');
+    const resetBtn = document.getElementById('reset');
+
+    setupHoldButton(btn1, 'player1');
+    setupHoldButton(btn2, 'player2');
+
+    resetBtn.addEventListener('click', () => {
+      scores.player1 = 0;
+      scores.player2 = 0;
+      updateButton(btn1, 0);
+      updateButton(btn2, 0);
     });
   </script>
 </body>
